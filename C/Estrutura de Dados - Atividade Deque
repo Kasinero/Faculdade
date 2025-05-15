@@ -1,0 +1,223 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Definicao de estrutura do no
+typedef struct No {
+    int valor;
+    struct No *prox;
+    struct No *ant;
+} No;
+
+// Definicao do deque com ponteiros
+typedef struct {
+    No *inicio;
+    No *fim;
+    int tamanho;
+
+    // Flags de controle
+    bool permiteInserirInicio;
+    bool permiteInserirFim;
+    bool permiteRemoverInicio;
+    bool permiteRemoverFim;
+} Deque;
+
+// Funcao para inicializar o deque
+void inicializar(Deque *dq) {
+    dq->inicio = NULL;
+    dq->fim = NULL;
+    dq->tamanho = 0;
+
+    // Ativa todas as permissoes por padrao
+    dq->permiteInserirInicio = true;
+    dq->permiteInserirFim = true;
+    dq->permiteRemoverInicio = true;
+    dq->permiteRemoverFim = true;
+}
+
+// Funcao para verificar se o deque esta vazio
+bool estaVazio(Deque *dq) {
+    return dq->tamanho == 0;
+}
+
+// Funcao para inserir no inicio do deque
+void inserirInicio(Deque *dq, int valor) {
+    if (!dq->permiteInserirInicio) {
+        printf("Insercao no inicio nao permitida.\n");
+        return;
+    }
+
+    No *novoNo = (No*)malloc(sizeof(No));
+    novoNo->valor = valor;
+    novoNo->prox = dq->inicio;
+    novoNo->ant = NULL;
+
+    if (dq->inicio != NULL) {
+        dq->inicio->ant = novoNo;
+    }
+
+    dq->inicio = novoNo;
+
+    if (dq->fim == NULL) {
+        dq->fim = novoNo; // Caso seja o primeiro no
+    }
+
+    dq->tamanho++;
+}
+
+// Funcao para inserir no fim do deque
+void inserirFim(Deque *dq, int valor) {
+    if (!dq->permiteInserirFim) {
+        printf("Insercao no fim nao permitida.\n");
+        return;
+    }
+
+    No *novoNo = (No*)malloc(sizeof(No));
+    novoNo->valor = valor;
+    novoNo->prox = NULL;
+    novoNo->ant = dq->fim;
+
+    if (dq->fim != NULL) {
+        dq->fim->prox = novoNo;
+    }
+
+    dq->fim = novoNo;
+
+    if (dq->inicio == NULL) {
+        dq->inicio = novoNo; // Caso seja o primeiro no
+    }
+
+    dq->tamanho++;
+}
+
+// Funcao para remover do inicio do deque
+void removerInicio(Deque *dq) {
+    if (!dq->permiteRemoverInicio || estaVazio(dq)) {
+        printf("Remocao no inicio nao permitida ou deque vazio.\n");
+        return;
+    }
+
+    No *temp = dq->inicio;
+    printf("Removido do inicio: %d\n", temp->valor);
+
+    dq->inicio = dq->inicio->prox;
+    if (dq->inicio != NULL) {
+        dq->inicio->ant = NULL;
+    }
+
+    free(temp);
+    dq->tamanho--;
+}
+
+// Funcao para remover do fim do deque
+void removerFim(Deque *dq) {
+    if (!dq->permiteRemoverFim || estaVazio(dq)) {
+        printf("Remocao no fim nao permitida ou deque vazio.\n");
+        return;
+    }
+
+    No *temp = dq->fim;
+    printf("Removido do fim: %d\n", temp->valor);
+
+    dq->fim = dq->fim->ant;
+    if (dq->fim != NULL) {
+        dq->fim->prox = NULL;
+    }
+
+    free(temp);
+    dq->tamanho--;
+}
+
+// Funcao para exibir o conteudo do deque
+void exibir(Deque *dq) {
+    No *atual = dq->inicio;
+    printf("Deque: ");
+    while (atual != NULL) {
+        printf("%d ", atual->valor);
+        atual = atual->prox;
+    }
+    printf("\n");
+}
+
+// Funcao para inverter os elementos do deque
+void inverterDeque(Deque *dq) {
+    if (estaVazio(dq)) {
+        printf("Deque vazio, nao ha o que inverter.\n");
+        return;
+    }
+
+    No *inicio = dq->inicio;
+    No *fim = dq->fim;
+
+    while (inicio != fim && inicio->ant != fim) {
+        int temp = inicio->valor;
+        inicio->valor = fim->valor;
+        fim->valor = temp;
+
+        inicio = inicio->prox;
+        fim = fim->ant;
+    }
+
+    printf("Deque invertido.\n");
+}
+
+// Funcao para o menu interativo
+void menu(Deque *dq) {
+    int escolha, valor;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Inserir no inicio\n");
+        printf("2. Inserir no fim\n");
+        printf("3. Remover do inicio\n");
+        printf("4. Remover do fim\n");
+        printf("5. Exibir deque\n");
+        printf("6. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &escolha);
+
+        switch (escolha) {
+            case 1:
+                if (dq->permiteInserirInicio) {
+                    printf("Digite o valor a inserir no inicio: ");
+                    scanf("%d", &valor);
+                    inserirInicio(dq, valor);
+                } else {
+                    printf("Insercao no inicio nao permitida.\n");
+                }
+                break;
+            case 2:
+                if (dq->permiteInserirFim) {
+                    printf("Digite o valor a inserir no fim: ");
+                    scanf("%d", &valor);
+                    inserirFim(dq, valor);
+                } else {
+                    printf("Insercao no fim nao permitida.\n");
+                }
+                break;
+            case 3:
+                removerInicio(dq);
+                break;
+            case 4:
+                removerFim(dq);
+                break;
+            case 5:
+                exibir(dq);
+                break;
+            case 6:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    } while (escolha != 6);
+}
+
+int main() {
+    Deque dq;
+    inicializar(&dq);
+
+    menu(&dq);
+
+    return 0;
+}
