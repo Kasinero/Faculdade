@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  </head>
+  <body>
+    </body>
+    <?php
+    $nomes = ["Cleber", "Rodolfo",
+     "Afonso", "Joana", "Cleide"];
+
+    foreach ($nomes as $nomes) {
+        echo $nomes . "<br>";
+    }
+    
+    $alunos = [
+    [
+        "nome" => "Cleide",
+        "notaP" => 4,
+        "notaF" => 2
+    ],
+    [
+        "nome" => "Cleber",
+        "notaP" => 5,
+        "notaF" => 7
+    ],
+    [
+        "nome" => "Afonso",
+        "notaP" => 8,
+        "notaF" => 5
+    ]
+    ];
+
+    foreach ($alunos as &$aluno){
+        $aluno['media'] = ($aluno['notaP'] +
+        $aluno['notaF']) / 2;
+    }
+    ?>
+    <body>
+        
+</body>
+</html>
